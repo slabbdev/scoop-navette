@@ -1,0 +1,21 @@
+{
+    "version": "1.6.0",
+    "description": "The browser for agents — one tiny binary driving the WebView your OS already ships (MCP native).",
+    "homepage": "https://github.com/slabbdev/navette",
+    "license": "MIT",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/slabbdev/navette/releases/download/v1.6.0/navette-windows-x64.exe",
+            "hash": "dab0bc4f13d06fa0946bb5eead0966dbb70b986791acd654b187eb10b031b82a"
+        }
+    },
+    "bin": "navette.exe",
+    "checkver": "github",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/slabbdev/navette/releases/download/v$version/navette-windows-x64.exe"
+            }
+        }
+    }
+}
