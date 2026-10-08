@@ -38,7 +38,7 @@ jobs:
           SHA=$(sha256sum asset.bin | cut -d' ' -f1)
           rm asset.bin
 
-          python3 "$VER" "$SHA" <<'PY'
+          python3 - "$VER" "$SHA" <<'PY'
           import json, sys
           ver, sha = sys.argv[1], sys.argv[2]
           with open('bucket/navette.json') as f:
