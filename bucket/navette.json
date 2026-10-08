@@ -1,12 +1,12 @@
 {
-    "version": "1.7.0",
-    "description": "The browser for agents \u2014 one tiny binary driving the WebView your OS already ships (MCP native).",
+    "version": "1.9.0",
+    "description": "The browser for agents — one tiny binary driving the WebView your OS already ships (MCP native).",
     "homepage": "https://github.com/slabbdev/navette",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/slabbdev/navette/releases/download/v1.6.0/navette-windows-x64.exe",
-            "hash": "5d77e6db22c118890d43c165eadd06ecc2734cfd2b3bff5fdae86b545a222728"
+            "url": "https://github.com/slabbdev/navette/releases/download/v1.9.0/navette-windows-x64.exe",
+            "hash": "0a8cf59e2fac94f557110a49945c7be8fcfd58457c90760289de40133271efd9"
         }
     },
     "bin": "navette.exe",

@@ -1,0 +1,59 @@
+name: bump
+
+# Keeps bucket/navette.json in sync with the latest slabbdev/navette release.
+# Runs hourly; also triggerable by hand right after tagging.
+
+on:
+  schedule:
+    - cron: '47 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: bump manifest to the latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          LATEST=$(gh api repos/slabbdev/navette/releases/latest --jq .tag_name)
+          VER=${LATEST#v}
+          CURR=$(python3 -c "import json;print(json.load(open('bucket/navette.json'))['version'])")
+          echo "bucket: $CURR — latest release: $VER"
+
+          [ "$VER" = "$CURR" ] && { echo "up to date"; exit 0; }
+
+          if ! gh release view "$LATEST" -R slabbdev/navette --json assets --jq '.assets[].name' | grep -qx 'navette-windows-x64.exe'; then
+            echo "windows-x64 asset not attached yet — retrying next run"; exit 0
+          fi
+          URL="https://github.com/slabbdev/navette/releases/download/${LATEST}/navette-windows-x64.exe"
+          curl -fsSL "$URL" -o asset.bin
+          SHA=$(sha256sum asset.bin | cut -d' ' -f1)
+          rm asset.bin
+
+          python3 "$VER" "$SHA" <<'PY'
+          import json, sys
+          ver, sha = sys.argv[1], sys.argv[2]
+          with open('bucket/navette.json') as f:
+              m = json.load(f)
+          m['version'] = ver
+          m['architecture']['64bit']['url'] = f"https://github.com/slabbdev/navette/releases/download/v{ver}/navette-windows-x64.exe"
+          m['architecture']['64bit']['hash'] = sha
+          with open('bucket/navette.json', 'w') as f:
+              json.dump(m, f, indent=4, ensure_ascii=False)
+              f.write('\n')
+          PY
+
+          grep -q "\"version\": \"${VER}\"" bucket/navette.json || { echo "rewrite produced no version change"; exit 1; }
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "bump: navette ${LATEST}"
+          git push
